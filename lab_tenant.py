@@ -111,7 +111,7 @@ def add_license(jwt,cookie,tenant_id):
     return response
 
 def usage():
-    print("Usage: ./lab_tenant <operation: clone|delete> <MSSP name> <MSSP API Key>")
+    print("Usage: python3 lab_tenant.py <operation: clone|delete> <MSSP name> <MSSP API Key>")
     print("If cloning tenants additional required params are: <Clone from tenantId> <number of demo tenants to create> <Admin username> <Admin password>")
 
 if __name__ == "__main__":
