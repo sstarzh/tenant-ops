@@ -7,6 +7,7 @@ Script is used to quickly mass-clone or remove tenants programmatically. Can be 
 
 ```
 git clone https://github.com/sstarzh/tenant-ops.git
+cd tenant-ops
 pip3 install -r requirements.txt
 ```
 
