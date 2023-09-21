@@ -1,6 +1,6 @@
 import requests
 import json
-import uuid, sys
+import uuid, sys, time
 
 
 def get_jwt(tenant, key):
@@ -54,14 +54,14 @@ def clone_tenant(rand_id,auth_tenant,orig_tenant,tenant_id,jwt,cookie):
     url = "https://ztadmin.ericomcloud.net/api/v1/tenants/clone"
 
     payload = json.dumps({
-      "name": "selab" + str(rand_id),
+      "name": "SP" + str(classNum)+ "Class" + str(rand_id),
       "id": str(tenant_id),
       "active": True,
       "partner": auth_tenant,
       "comment": "Lab tenant - " + str(rand_id),
       "clone": {
         "from": str(orig_tenant),
-        "cloneAuthentication": True,
+        "cloneAuthentication": False,
         "cloneSettings": True,
         "cloneProfilesPoliciesAndApps": True,
         "cloneZTNA": True
@@ -111,8 +111,8 @@ def add_license(jwt,cookie,tenant_id):
     return response
 
 def usage():
-    print("Usage: python3 lab_tenant.py <operation: clone|delete> <MSSP name> <MSSP API Key>")
-    print("If cloning tenants additional required params are: <Clone from tenantId> <number of demo tenants to create> <Admin username> <Admin password>")
+    print("Usage: python3 lab_tenant.py <operation: clone|delete> <MSSP name> <MSSP API Key> <class #>")
+    print("If cloning tenants additional required params are: <Clone from tenantId> <number of demo tenants to create> <Admin username> <Admin password> <class #>")
 
 if __name__ == "__main__":
     
@@ -132,6 +132,12 @@ if __name__ == "__main__":
         key = sys.argv[3]
     except:
         print("API Key missing")
+        usage()
+        exit(1)
+    try:
+        classNum = sys.argv[4]
+    except:
+        print("Class # is missing")
         usage()
         exit(1)
     
@@ -160,6 +166,12 @@ if __name__ == "__main__":
             print("Admin password is missing")
             usage()
             exit(1)
+        try:
+            classNum = sys.argv[8]
+        except:
+            print("Class # is missing")
+            usage()
+            exit(1)
     jwt, cookie = get_jwt(auth_tenant, key)
 
     if (( op != "clone") & ( op != "delete")):
@@ -170,7 +182,7 @@ if __name__ == "__main__":
         tenants = get_tenants(jwt,cookie)
  
         for tenant in tenants.json():
-            if tenant["name"].startswith("selab"):
+            if tenant["name"].startswith("SP8Class"):
                 print("Deleting tenant: " + tenant["name"])
                 resp = delete_tenant(tenant["id"],jwt,cookie)
                 if resp.status_code!= 204:
@@ -193,16 +205,19 @@ if __name__ == "__main__":
                 print("Response:" + str(resp.text))
                 exit(1)
             print("Cloned tenant: " + str(demo_n) + " Tenant ID: " + str(tenant_id))
+            time.sleep(6)
             admin = add_admin(jwt,cookie,tenant_id)
             if admin.status_code!= 204:
                 print("Error adding Administrator...")
                 print("Response:" + str(admin.status_code))
                 print("Response:" + str(admin.text))
+            time.sleep(2)
             lic = add_license(jwt,cookie,tenant_id)
             if lic.status_code!= 204:
                 print("Error adding License...")
                 print("Response:" + str(lic.status_code))
                 print("Response:" + str(lic.text))
+            time.sleep(2)
         print("Finished cloning demo tenants")
     logout(jwt)
 
