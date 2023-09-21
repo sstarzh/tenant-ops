@@ -182,7 +182,7 @@ if __name__ == "__main__":
         tenants = get_tenants(jwt,cookie)
  
         for tenant in tenants.json():
-            if tenant["name"].startswith("SP8Class"):
+            if tenant["name"].startswith("SP" + str(classNum)+ "Class"):
                 print("Deleting tenant: " + tenant["name"])
                 resp = delete_tenant(tenant["id"],jwt,cookie)
                 if resp.status_code!= 204:
@@ -191,6 +191,7 @@ if __name__ == "__main__":
                     print("Response:" + str(resp.text))
                     exit(1)
                 print("Done")
+                time.sleep(3)
         print("Finished deleting demo tenants")
         exit(0)
 
