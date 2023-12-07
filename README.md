@@ -14,7 +14,7 @@ pip3 install -r requirements.txt
 ### To clone tenants:
 
 ```
-python3 lab_tenant.py clone <MSSP name> <MSSP API Key> <Clone from tenantId> <number of demo tenants to create> <Admin username> <Admin password>
+python3 lab_tenant.py clone <MSSP name> <MSSP API Key> <Clone from tenantId> <number of demo tenants to create> <Admin username> <Admin password> <class#>
 ```
 Example:
 
