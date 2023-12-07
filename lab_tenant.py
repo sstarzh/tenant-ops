@@ -59,9 +59,11 @@ def clone_tenant(rand_id,auth_tenant,orig_tenant,tenant_id,jwt,cookie):
       "active": True,
       "partner": auth_tenant,
       "comment": "Lab tenant - " + str(rand_id),
+      "builtinIdPUsername": admin_user,
+      "builtinIdPPassword": admin_pw,
       "clone": {
         "from": str(orig_tenant),
-        "cloneAuthentication": False,
+        "cloneAuthentication": True,
         "cloneSettings": True,
         "cloneProfilesPoliciesAndApps": True,
         "cloneZTNA": True
