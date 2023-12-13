@@ -78,22 +78,6 @@ def clone_tenant(rand_id,auth_tenant,orig_tenant,tenant_id,jwt,cookie):
     response = requests.request("POST", url, headers=headers, data=payload)
     return response
 
-def add_license(jwt,cookie,tenant_id):
-    url = "https://ztadmin.ericomcloud.net/api/v1/license/{tenant_id}".format(tenant_id=str(tenant_id))
-    payload = json.dumps({
-        "type": "Named Users (Full)",
-        "expiration": "2023-12-31",
-        "number": 20
-      }
-      )
-    headers = {
-      'Content-Type': 'application/json',
-      'Authorization': (f'Bearer {jwt}'),
-      'Cookie': 'route={0}'.format(str(cookie))
-    }
-    response = requests.request("PATCH", url, headers=headers, data=payload)
-    return response
-
 def usage():
     print("Usage: python3 lab_tenant.py <operation: clone|delete> <MSSP name> <MSSP API Key> <class #>")
     print("If cloning tenants additional required params are: <Clone from tenantId> <number of demo tenants to create> <Admin username> <Admin password> <class #>")
