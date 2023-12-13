@@ -175,18 +175,6 @@ if __name__ == "__main__":
                 exit(1)
             print("Cloned tenant: " + str(demo_n) + " Tenant ID: " + str(tenant_id))
             time.sleep(6)
-            admin = add_admin(jwt,cookie,tenant_id)
-            if admin.status_code!= 204:
-                print("Error adding Administrator...")
-                print("Response:" + str(admin.status_code))
-                print("Response:" + str(admin.text))
-            time.sleep(2)
-            lic = add_license(jwt,cookie,tenant_id)
-            if lic.status_code!= 204:
-                print("Error adding License...")
-                print("Response:" + str(lic.status_code))
-                print("Response:" + str(lic.text))
-            time.sleep(2)
         print("Finished cloning demo tenants")
     logout(jwt)
 
