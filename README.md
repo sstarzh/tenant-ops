@@ -19,17 +19,17 @@ python3 lab_tenant.py clone <MSSP name> <MSSP API Key> <Clone from tenantId> <nu
 Example:
 
 ```
-python3 lab_tenant.py clone demoMSSP 0000-0000-0000-0000 1111-1111-1111-1111 10 testadmin supersecretpw
+python3 lab_tenant.py clone demoMSSP 0000-0000-0000-0000 1111-1111-1111-1111 10 testadmin supersecretpw 1
 ```
 ### To delete all tenants named "selabXYZ":
 
 ```
-python3 lab_tenant.py delete <MSSP name> <MSSP API Key>
+python3 lab_tenant.py delete <MSSP name> <MSSP API Key> <class#>
 ```
 
 Example:
 
 ```
-python3 lab_tenant.py delete demoMSSP 0000-0000-0000-0000 1111-1111-1111-1111
+python3 lab_tenant.py delete demoMSSP 0000-0000-0000-0000 1111-1111-1111-1111 1
 ```
 
