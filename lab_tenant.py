@@ -78,24 +78,6 @@ def clone_tenant(rand_id,auth_tenant,orig_tenant,tenant_id,jwt,cookie):
     response = requests.request("POST", url, headers=headers, data=payload)
     return response
 
-def add_admin(jwt,cookie,tenant_id):
-    url = "https://ztadmin.ericomcloud.net/api/v1/administrators/credentials/{tenant_id}".format(tenant_id=str(tenant_id))
-
-    payload = json.dumps({
-        "role": "Administrator",
-        "username": admin_user,
-        "password": admin_pw,
-        "email": f'{admin_user}@newtenant.com'
-      }
-      )
-    headers = {
-      'Content-Type': 'application/json',
-      'Authorization': (f'Bearer {jwt}'),
-      'Cookie': 'route={0}'.format(str(cookie))
-    }
-    response = requests.request("POST", url, headers=headers, data=payload)
-    return response
-
 def add_license(jwt,cookie,tenant_id):
     url = "https://ztadmin.ericomcloud.net/api/v1/license/{tenant_id}".format(tenant_id=str(tenant_id))
     payload = json.dumps({
