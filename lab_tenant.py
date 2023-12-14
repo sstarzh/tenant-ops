@@ -78,40 +78,6 @@ def clone_tenant(rand_id,auth_tenant,orig_tenant,tenant_id,jwt,cookie):
     response = requests.request("POST", url, headers=headers, data=payload)
     return response
 
-def add_admin(jwt,cookie,tenant_id):
-    url = "https://ztadmin.ericomcloud.net/api/v1/administrators/credentials/{tenant_id}".format(tenant_id=str(tenant_id))
-
-    payload = json.dumps({
-        "role": "Administrator",
-        "username": admin_user,
-        "password": admin_pw,
-        "email": f'{admin_user}@newtenant.com'
-      }
-      )
-    headers = {
-      'Content-Type': 'application/json',
-      'Authorization': (f'Bearer {jwt}'),
-      'Cookie': 'route={0}'.format(str(cookie))
-    }
-    response = requests.request("POST", url, headers=headers, data=payload)
-    return response
-
-def add_license(jwt,cookie,tenant_id):
-    url = "https://ztadmin.ericomcloud.net/api/v1/license/{tenant_id}".format(tenant_id=str(tenant_id))
-    payload = json.dumps({
-        "type": "Named Users (Full)",
-        "expiration": "2023-12-31",
-        "number": 20
-      }
-      )
-    headers = {
-      'Content-Type': 'application/json',
-      'Authorization': (f'Bearer {jwt}'),
-      'Cookie': 'route={0}'.format(str(cookie))
-    }
-    response = requests.request("PATCH", url, headers=headers, data=payload)
-    return response
-
 def usage():
     print("Usage: python3 lab_tenant.py <operation: clone|delete> <MSSP name> <MSSP API Key> <class #>")
     print("If cloning tenants additional required params are: <Clone from tenantId> <number of demo tenants to create> <Admin username> <Admin password> <class #>")
@@ -209,18 +175,6 @@ if __name__ == "__main__":
                 exit(1)
             print("Cloned tenant: " + str(demo_n) + " Tenant ID: " + str(tenant_id))
             time.sleep(6)
-            admin = add_admin(jwt,cookie,tenant_id)
-            if admin.status_code!= 204:
-                print("Error adding Administrator...")
-                print("Response:" + str(admin.status_code))
-                print("Response:" + str(admin.text))
-            time.sleep(2)
-            lic = add_license(jwt,cookie,tenant_id)
-            if lic.status_code!= 204:
-                print("Error adding License...")
-                print("Response:" + str(lic.status_code))
-                print("Response:" + str(lic.text))
-            time.sleep(2)
         print("Finished cloning demo tenants")
     logout(jwt)
 
