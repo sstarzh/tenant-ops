@@ -2,9 +2,9 @@ import requests
 import json
 import uuid, sys, time
 
-
+base_url = "https://cloud-demo-ztadmin.ericomcloud.net/api/v1/"
 def get_jwt(tenant, key):
-    url = "https://ztadmin.ericomcloud.net/api/v1/auth"
+    url = base_url + "auth"
 
     payload = json.dumps({
       "mssp": tenant,
@@ -21,7 +21,7 @@ def get_jwt(tenant, key):
     return jwt, cookie
 
 def logout(jwt):
-    url = "https://ztadmin.ericomcloud.net/api/v1/auth"
+    url = base_url + "auth"
     headers = {
       'Content-Type': 'application/json',
       'Authorization': (f'Bearer {jwt}')
@@ -31,7 +31,7 @@ def logout(jwt):
     return response
 
 def get_tenants(jwt,cookie):
-    url = "https://ztadmin.ericomcloud.net/api/v1/mssp/tenants"
+    url = base_url + "mssp/tenants"
     payload = {}
     headers = {
       'Authorization': 'Bearer {0}'.format(str(jwt)),
@@ -41,7 +41,7 @@ def get_tenants(jwt,cookie):
     return response
 
 def delete_tenant(tenant_id,jwt,cookie):
-    url = "https://ztadmin.ericomcloud.net/api/v1/tenants/{tenant_id}".format(tenant_id=str(tenant_id))
+    url = base_url + "tenants/{tenant_id}".format(tenant_id=str(tenant_id))
     payload = {}
     headers = {
       'Authorization': 'Bearer {0}'.format(str(jwt)),
@@ -50,15 +50,31 @@ def delete_tenant(tenant_id,jwt,cookie):
     response = requests.request("DELETE", url, headers=headers, data=payload)
     return response
 
+def add_license(jwt,cookie,tenant_id):
+    url = base_url + "license/{tenant_id}".format(tenant_id=str(tenant_id))
+    payload = json.dumps({
+        "type": "Named Users (Full)",
+        "expiration": "2024-12-31",
+        "number": 20
+      }
+      )
+    headers = {
+      'Content-Type': 'application/json',
+      'Authorization': (f'Bearer {jwt}'),
+      'Cookie': 'route={0}'.format(str(cookie))
+    }
+    response = requests.request("PATCH", url, headers=headers, data=payload)
+    return response
+
 def clone_tenant(rand_id,auth_tenant,orig_tenant,tenant_id,jwt,cookie):
-    url = "https://ztadmin.ericomcloud.net/api/v1/tenants/clone"
+    url = base_url + "tenants/clone"
 
     payload = json.dumps({
-      "name": "SP" + str(classNum)+ "Class" + str(rand_id),
+      "name": "summit" + str(classNum)+ "group" + str(rand_id),
       "id": str(tenant_id),
       "active": True,
       "partner": auth_tenant,
-      "comment": "Lab tenant - " + str(rand_id),
+      "comment": "SE tenant - " + str(rand_id),
       "builtinIdPUsername": admin_user,
       "builtinIdPPassword": admin_pw,
       "clone": {
@@ -150,7 +166,7 @@ if __name__ == "__main__":
         tenants = get_tenants(jwt,cookie)
  
         for tenant in tenants.json():
-            if tenant["name"].startswith("SP" + str(classNum)+ "Class"):
+            if tenant["name"].startswith("summit" + str(classNum)+ "group"):
                 print("Deleting tenant: " + tenant["name"])
                 resp = delete_tenant(tenant["id"],jwt,cookie)
                 if resp.status_code!= 204:
@@ -173,6 +189,7 @@ if __name__ == "__main__":
                 print("Response:" + str(resp.status_code))
                 print("Response:" + str(resp.text))
                 exit(1)
+            add_license(jwt,cookie,tenant_id)
             print("Cloned tenant: " + str(demo_n) + " Tenant ID: " + str(tenant_id))
             time.sleep(6)
         print("Finished cloning demo tenants")
