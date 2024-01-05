@@ -3,6 +3,21 @@ import json
 import uuid, sys, time
 
 base_url = "https://cloud-demo-ztadmin.ericomcloud.net/api/v1/"
+
+def get_auth_status(jwt,cookie):
+    url = base_url + "auth"
+
+    payload = {}
+    headers = {
+      'Authorization': 'Bearer {0}'.format(str(jwt)),
+      'Cookie': 'route={0}'.format(str(cookie))
+    }
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+ 
+    code = response.status_code
+    return code
+
 def get_jwt(tenant, key):
     url = base_url + "auth"
 
@@ -70,11 +85,11 @@ def clone_tenant(rand_id,auth_tenant,orig_tenant,tenant_id,jwt,cookie):
     url = base_url + "tenants/clone"
 
     payload = json.dumps({
-      "name": "summit" + str(classNum)+ "group" + str(rand_id),
+      "name": classNum + str(rand_id),
       "id": str(tenant_id),
       "active": True,
       "partner": auth_tenant,
-      "comment": "SE tenant - " + str(rand_id),
+      "comment": classNum + " tenant - " + str(rand_id),
       "builtinIdPUsername": admin_user,
       "builtinIdPPassword": admin_pw,
       "clone": {
@@ -95,8 +110,8 @@ def clone_tenant(rand_id,auth_tenant,orig_tenant,tenant_id,jwt,cookie):
     return response
 
 def usage():
-    print("Usage: python3 lab_tenant.py <operation: clone|delete> <MSSP name> <MSSP API Key> <class #>")
-    print("If cloning tenants additional required params are: <Clone from tenantId> <number of demo tenants to create> <Admin username> <Admin password> <class #>")
+    print("Usage: python3 lab_tenant.py <operation: clone|delete> <MSSP name> <MSSP API Key> <tenant name>")
+    print("If cloning tenants additional required params are: <Clone from tenantId> <number of demo tenants to create> <Admin username> <Admin password> <tenant name>")
 
 if __name__ == "__main__":
     
@@ -153,7 +168,7 @@ if __name__ == "__main__":
         try:
             classNum = sys.argv[8]
         except:
-            print("Class # is missing")
+            print("Tenant name is missing")
             usage()
             exit(1)
     jwt, cookie = get_jwt(auth_tenant, key)
@@ -166,7 +181,7 @@ if __name__ == "__main__":
         tenants = get_tenants(jwt,cookie)
  
         for tenant in tenants.json():
-            if tenant["name"].startswith("summit" + str(classNum)+ "group"):
+            if tenant["name"].startswith(classNum):
                 print("Deleting tenant: " + tenant["name"])
                 resp = delete_tenant(tenant["id"],jwt,cookie)
                 if resp.status_code!= 204:
@@ -175,7 +190,7 @@ if __name__ == "__main__":
                     print("Response:" + str(resp.text))
                     exit(1)
                 print("Done")
-                time.sleep(3)
+                time.sleep(6)
         print("Finished deleting demo tenants")
         exit(0)
 
@@ -183,6 +198,10 @@ if __name__ == "__main__":
         print("Cloning demo tenants")
         for demo_n in range (1,int(number_tenants)+1):
             tenant_id = uuid.uuid4()
+            code = get_auth_status(jwt,cookie)
+            if code== 401:
+                print("JWT expired, getting new one")
+                jwt, cookie = get_jwt(auth_tenant, key)
             resp = clone_tenant(demo_n,auth_tenant,orig_tenant,tenant_id,jwt,cookie)
             if resp.status_code!= 204:
                 print("Error cloning tenant " + str(demo_n))
